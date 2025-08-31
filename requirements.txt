@@ -6,7 +6,7 @@ pytesseract==0.3.10
 Pillow==10.4.0
 opencv-python-headless==4.8.0.74
 transformers==4.30.2
-torch==2.0.1+cpu
+torch==2.5.1
 sentencepiece==0.1.99
 protobuf==3.20.3
 deep-translator==1.11.4
