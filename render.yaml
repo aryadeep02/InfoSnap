@@ -1,12 +1,10 @@
 services:
   - type: web
-    name: info-snap
+    name: infosnap
     env: python
-    runtime: python
-    pythonVersion: 3.10   # 👈 force Python 3.10 (most stable)
+    plan: starter    
     buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
-    startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120"
-    autoDeploy: true
+    startCommand: "gunicorn app:app --workers=1 --threads=1 --timeout 120"
     envVars:
-      - key: SECRET_KEY
-        value: "your-secret-key-here"
+      - key: PYTHONUNBUFFERED
+        value: "true"
