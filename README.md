@@ -1,6 +1,5 @@
 📑 Info Snap - AI-Powered Document Summary Assistant
 A modern web application that uses artificial intelligence to automatically summarize documents and extract key information from PDFs and images.
-
 AI PoweredPythonFlaskLicense
 
 🌟 Overview
