@@ -1,4 +1,3 @@
-
 let selectedFile = null;
 
 const uploadArea = document.getElementById('uploadArea');
@@ -8,16 +7,21 @@ const resultsSection = document.getElementById('resultsSection');
 const loading = document.getElementById('loading');
 const errorMessage = document.getElementById('errorMessage');
 
-uploadArea.addEventListener('dragover', (e) => {
+// Add null checks for critical elements
+if (!uploadArea || !fileInput || !generateBtn) {
+    console.error('Critical DOM elements not found');
+}
+
+uploadArea?.addEventListener('dragover', (e) => {
     e.preventDefault(); 
     uploadArea.classList.add('drag-over'); 
 });
 
-uploadArea.addEventListener('dragleave', () => {
+uploadArea?.addEventListener('dragleave', () => {
     uploadArea.classList.remove('drag-over');
 });
 
-uploadArea.addEventListener('drop', (e) => {
+uploadArea?.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadArea.classList.remove('drag-over');
 
@@ -27,7 +31,7 @@ uploadArea.addEventListener('drop', (e) => {
     }
 });
 
-fileInput.addEventListener('change', (e) => {
+fileInput?.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         handleFileSelect(e.target.files[0]);
     }
@@ -37,7 +41,7 @@ function handleFileSelect(file) {
     const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/bmp'];
     
     if (!allowedTypes.includes(file.type)) {
-        showError('Please Upload a Valid File - PDF or Image (PNG, JPG, GIF, BMP)');
+        showError('Please upload a valid file - PDF or Image (PNG, JPG, GIF, BMP)');
         return;
     }
     
@@ -47,25 +51,34 @@ function handleFileSelect(file) {
     }
     
     selectedFile = file;
-    uploadArea.querySelector('h3').textContent = `Selected: ${file.name}`;
-    generateBtn.disabled = false; 
+    const uploadTitle = uploadArea?.querySelector('h3');
+    if (uploadTitle) {
+        uploadTitle.textContent = `Selected: ${file.name}`;
+    }
+    if (generateBtn) generateBtn.disabled = false; 
     hideError();
 }
 
-generateBtn.addEventListener('click', async () => {
+generateBtn?.addEventListener('click', async () => {
     if (!selectedFile) {
-        showError('Please Select a file first');
+        showError('Please select a file first');
+        return;
+    }
+    
+    const lengthInput = document.querySelector('input[name="length"]:checked');
+    if (!lengthInput) {
+        showError('Please select a summary length');
         return;
     }
     
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('length', document.querySelector('input[name="length"]:checked').value);
+    formData.append('length', lengthInput.value);
     
-    loading.style.display = 'block';
-    resultsSection.style.display = 'none';
+    if (loading) loading.style.display = 'block';
+    if (resultsSection) resultsSection.style.display = 'none';
     hideError();
-    generateBtn.disabled = true;
+    if (generateBtn) generateBtn.disabled = true;
     
     try {
         const response = await fetch('/upload', {
@@ -78,73 +91,96 @@ generateBtn.addEventListener('click', async () => {
         if (response.ok && data.success) {
             displayResults(data);
         } else {
-            showError(data.error || 'Something Went Wrong');
+            showError(data.error || 'Something went wrong. Please try again.');
         }
     } catch (error) {
-        showError('Network error, Please Retry');
+        showError('Network error. Please check your connection and try again.');
         console.error('Error:', error);
     } finally {
-        loading.style.display = 'none';
-        generateBtn.disabled = false;
+        if (loading) loading.style.display = 'none';
+        if (generateBtn) generateBtn.disabled = false;
     }
 });
 
 function displayResults(data) {
-    document.getElementById('originalWords').textContent = `${data.text_length} words`;
-    document.getElementById('summaryWords').textContent = `${data.summary_length} words`;
-    
-    document.getElementById('summaryText').textContent = data.summary;
-
+    const originalWords = document.getElementById('originalWords');
+    const summaryWords = document.getElementById('summaryWords');
+    const summaryText = document.getElementById('summaryText');
     const keyPointsList = document.getElementById('keyPointsList');
-    keyPointsList.innerHTML = '';
-    data.key_points.forEach(point => {
-        const li = document.createElement('li');
-        li.textContent = point;
-        keyPointsList.appendChild(li);
-    });
     
+    if (originalWords) originalWords.textContent = `${data.text_length} words`;
+    if (summaryWords) summaryWords.textContent = `${data.summary_length} words`;
+    if (summaryText) summaryText.textContent = data.summary;
 
-    resultsSection.style.display = 'block';
+    if (keyPointsList) {
+        keyPointsList.innerHTML = '';
+        data.key_points.forEach(point => {
+            const li = document.createElement('li');
+            li.textContent = point;
+            keyPointsList.appendChild(li);
+        });
+    }
 
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    if (resultsSection) {
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 function resetApp() {
     selectedFile = null;
-    fileInput.value = '';
-    uploadArea.querySelector('h3').textContent = 'Drag & Drop your file here';
-    generateBtn.disabled = true;
-    resultsSection.style.display = 'none';
+    if (fileInput) fileInput.value = '';
+    
+    const uploadTitle = uploadArea?.querySelector('h3');
+    if (uploadTitle) {
+        uploadTitle.textContent = 'Drag & Drop your file here';
+    }
+    
+    if (generateBtn) generateBtn.disabled = true;
+    if (resultsSection) resultsSection.style.display = 'none';
     hideError();
 
-    document.querySelector('input[name="length"][value="medium"]').checked = true;
+    const defaultLength = document.querySelector('input[name="length"][value="medium"]');
+    if (defaultLength) defaultLength.checked = true;
 }
 
 function showError(message) {
-    errorMessage.style.display = 'block';
-    errorMessage.querySelector('p').textContent = message;
+    if (errorMessage) {
+        errorMessage.style.display = 'block';
+        const errorText = errorMessage.querySelector('p');
+        if (errorText) errorText.textContent = message;
+    }
 }
 
 function hideError() {
-    errorMessage.style.display = 'none';
+    if (errorMessage) errorMessage.style.display = 'none';
 }
 
 async function translateSummary() {
     const languageSelect = document.getElementById('languageSelect');
-    const selectedLang = languageSelect.value;
+    const selectedLang = languageSelect?.value;
     
     if (!selectedLang) {
-        alert('Please Select a Language!');
+        alert('Please select a language!');
         return;
     }
     
-    const summaryText = document.getElementById('summaryText').textContent;
+    const summaryTextElement = document.getElementById('summaryText');
+    const summaryText = summaryTextElement?.textContent;
+    
+    if (!summaryText) {
+        alert('No summary available to translate');
+        return;
+    }
+    
     const translateBtn = document.getElementById('translateBtn');
     const translatedResult = document.getElementById('translatedResult');
     const translatedTextElement = document.getElementById('translatedText');
     
-    translateBtn.disabled = true;
-    translateBtn.textContent = 'Translating...';
+    if (translateBtn) {
+        translateBtn.disabled = true;
+        translateBtn.textContent = 'Translating...';
+    }
     
     try {
         const response = await fetch('/translate', {
@@ -161,18 +197,21 @@ async function translateSummary() {
         const data = await response.json();
         
         if (data.success) {
-            translatedTextElement.textContent = data.translated_text;
-            translatedResult.style.display = 'block';
-            
-            translatedResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if (translatedTextElement) translatedTextElement.textContent = data.translated_text;
+            if (translatedResult) {
+                translatedResult.style.display = 'block';
+                translatedResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         } else {
-            alert('Translation Failed: ' + (data.error || 'Unknown error'));
+            alert('Translation failed: ' + (data.error || 'Unknown error'));
         }
     } catch (error) {
-        alert('Translation error ' + error.message);
+        alert('Translation error: ' + error.message);
     } finally {
-        translateBtn.disabled = false;
-        translateBtn.textContent = 'Translate';
+        if (translateBtn) {
+            translateBtn.disabled = false;
+            translateBtn.textContent = 'Translate';
+        }
     }
 }
 
@@ -183,36 +222,45 @@ function toggleTheme() {
     
     if (currentTheme === 'dark') {
         html.setAttribute('data-theme', 'light');
-        themeIcon.textContent = '🌙';
+        if (themeIcon) themeIcon.textContent = '🌙';
         localStorage.setItem('theme', 'light');
     } else {
         html.setAttribute('data-theme', 'dark');
-        themeIcon.textContent = '☀️';
+        if (themeIcon) themeIcon.textContent = '☀️';
         localStorage.setItem('theme', 'dark');
     }
 }
 
 async function downloadPDF() {
-    const summary = document.getElementById('summaryText').textContent;
+    const summaryElement = document.getElementById('summaryText');
+    const summary = summaryElement?.textContent;
+    
+    if (!summary) {
+        alert('No summary available to download');
+        return;
+    }
+    
     const keyPointsElements = document.querySelectorAll('#keyPointsList li');
     const keyPoints = Array.from(keyPointsElements).map(li => li.textContent);
     const languageSelect = document.getElementById('languageSelect');
-    const language = languageSelect ? languageSelect.value : 'en';
+    const language = languageSelect?.value || 'en';
     
     const downloadBtn = document.querySelector('.download-btn');
-    const originalText = downloadBtn.textContent;
-    downloadBtn.disabled = true;
-    downloadBtn.textContent = 'Pdf is Loading';
+    const originalText = downloadBtn?.textContent || 'Download PDF';
+    
+    if (downloadBtn) {
+        downloadBtn.disabled = true;
+                downloadBtn.textContent = 'Generating PDF...';
+    }
     
     try {
-
         const response = await fetch('/download-pdf', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 summary: summary,
                 key_points: keyPoints,
-                language: language || 'en'
+                language: language
             })
         });
         
@@ -221,17 +269,22 @@ async function downloadPDF() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `summary_${language || 'en'}.pdf`;
+            a.download = `summary_${language}.pdf`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         } else {
-            alert('PDF generate error, Please Retry');
+            const errorData = await response.json().catch(() => ({}));
+            alert('PDF generation error: ' + (errorData.error || 'Please try again'));
         }
     } catch (error) {
         alert('PDF download error: ' + error.message);
     } finally {
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = originalText;
+        if (downloadBtn) {
+            downloadBtn.disabled = false;
+            downloadBtn.textContent = originalText;
+        }
     }
 }
 
@@ -240,14 +293,20 @@ async function shareSummary() {
     const keyPointsElements = document.querySelectorAll('#keyPointsList li');
     
     if (!summaryElement || !summaryElement.textContent) {
-        alert('First Generate Summary');
+        alert('Please generate a summary first');
         return;
     }
     
     const summary = summaryElement.textContent;
     const keyPoints = Array.from(keyPointsElements).map(li => li.textContent);
     const languageSelect = document.getElementById('languageSelect');
-    const language = languageSelect ? languageSelect.value : 'en';
+    const language = languageSelect?.value || 'en';
+    
+    // Disable share button while processing
+    const shareBtn = event?.target;
+    if (shareBtn && shareBtn.tagName === 'BUTTON') {
+        shareBtn.disabled = true;
+    }
     
     try {
         const response = await fetch('/share', {
@@ -256,7 +315,7 @@ async function shareSummary() {
             body: JSON.stringify({
                 summary: summary,
                 key_points: keyPoints,
-                language: language || 'en'
+                language: language
             })
         });
         
@@ -272,34 +331,77 @@ async function shareSummary() {
                 shareModal.classList.add('active');
                 if (shareOverlay) shareOverlay.style.display = 'block';
             } else {
-                navigator.clipboard.writeText(data.share_url).then(() => {
-                    alert('Share link Copied!\n\n' + data.share_url);
-                }).catch(err => {
-                    prompt('Copy This Link', data.share_url);
-                });
+                // Fallback if modal elements don't exist
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(data.share_url).then(() => {
+                        alert('Share link copied to clipboard!\n\n' + data.share_url);
+                    }).catch(err => {
+                        prompt('Copy this link:', data.share_url);
+                    });
+                } else {
+                    prompt('Copy this link:', data.share_url);
+                }
             }
         } else {
-            alert('Error: ' + (data.error || 'No Share Link Made'));
+            alert('Error creating share link: ' + (data.error || 'Please try again'));
         }
     } catch (error) {
         console.error('Share error:', error);
-        alert('Something Went Wrong ' + error.message);
+        alert('Failed to create share link: ' + error.message);
+    } finally {
+        if (shareBtn && shareBtn.tagName === 'BUTTON') {
+            shareBtn.disabled = false;
+        }
     }
 }
 
-// Share link copy karne ka function
 function copyShareLink() {
     const shareLink = document.getElementById('shareLink');
-    if (shareLink) {
-        shareLink.select();
-        document.execCommand('copy');
-        alert('Link copied! ');
+    if (!shareLink) return;
+    
+    shareLink.select();
+    shareLink.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareLink.value).then(() => {
+                showCopyFeedback('Link copied!');
+            }).catch(() => {
+                fallbackCopy();
+            });
+        } else {
+            fallbackCopy();
+        }
+    } catch (err) {
+        fallbackCopy();
+    }
+    
+    function fallbackCopy() {
+        if (document.execCommand('copy')) {
+            showCopyFeedback('Link copied!');
+        } else {
+            alert('Please manually copy the link');
+        }
+    }
+    
+    function showCopyFeedback(message) {
+        const copyBtn = document.querySelector('.copy-btn');
+        if (copyBtn) {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = message;
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        } else {
+            alert(message);
+        }
     }
 }
 
 function closeShareModal() {
     const shareModal = document.getElementById('shareModal');
     const shareOverlay = document.getElementById('shareOverlay');
+    
     if (shareModal) {
         shareModal.classList.remove('active');
     }
@@ -308,15 +410,33 @@ function closeShareModal() {
     }
 }
 
+// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply saved theme
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     const themeIcon = document.getElementById('themeIcon');
     if (themeIcon) {
         themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
     }
+    
+    // Add ESC key listener for modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeShareModal();
+        }
+    });
+    
+    // Add click outside modal to close
+    const shareOverlay = document.getElementById('shareOverlay');
+    shareOverlay?.addEventListener('click', (e) => {
+        if (e.target === shareOverlay) {
+            closeShareModal();
+        }
+    });
 });
 
+// Export functions to global scope
 window.resetApp = resetApp;
 window.translateSummary = translateSummary;
 window.toggleTheme = toggleTheme;
