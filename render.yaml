@@ -3,10 +3,10 @@ services:
     name: info-snap
     env: python
     runtime: python
-    pythonVersion: 3.10   # use 3.10, NOT 3.13
+    pythonVersion: 3.10   # 👈 force Python 3.10 (most stable)
     buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
     startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120"
     autoDeploy: true
     envVars:
       - key: SECRET_KEY
-        value: "my-super-secret-key"
+        value: "your-secret-key-here"
