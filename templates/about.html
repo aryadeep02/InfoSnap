@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - {{ app_name }}</title>
+    
+    <!-- Same head content as index.html -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Same navbar as index.html but with 'about' active -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <div class="logo-wrapper">
+                    <img class="logo-img" src="{{ url_for('static', filename='image24.jpeg') }}" alt="Info Snap Logo">
+                </div>
+                <span class="brand-text">Info Snap</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about"><i class="fas fa-info-circle"></i> About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact"><i class="fas fa-envelope"></i> Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/developer"><i class="fas fa-code"></i> Developer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/blog"><i class="fas fa-blog"></i> Blog</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+    </button>
+
+    <div class="main-wrapper">
+        <div class="container">
+            <header>
+                <h1 class="main-title">
+                    <span class="title-icon">📖</span>
+                    <span class="title-text">About Info Snap</span>
+                </h1>
+                <p class="subtitle">AI-Powered Document Summarization Made Easy</p>
+            </header>
+
+            <main>
+                <div class="about-content">
+                    <div class="about-section">
+                        <h2>🚀 What is Info Snap?</h2>
+                        <p>Info Snap is an advanced AI-powered document summarization tool that helps you extract key information from PDFs and images in seconds. Whether you're a student, researcher, or professional, Info Snap saves you time by providing concise summaries of lengthy documents.</p>
+                    </div>
+
+                    <div class="about-section">
+                        <h2>✨ Key Features</h2>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <span class="feature-icon">📄</span>
+                                <h3>Multiple Formats</h3>
+                                <p>Support for PDF, PNG, JPG, JPEG, GIF, and BMP files</p>
+                            </div>
+                            <div class="feature-card">
+                                <span class="feature-icon">🤖</span>
+                                <h3>AI-Powered</h3>
+                                <p>Advanced algorithms for accurate text extraction and summarization</p>
+                            </div>
+                            <div class="feature-card">
+                                <span class="feature-icon">🌐</span>
+                                <h3>Multi-Language</h3>
+                                <p>Translate summaries into 15+ languages instantly</p>
+                            </div>
+                            <div class="feature-card">
+                                <span class="feature-icon">📥</span>
+                                <h3>Download & Share</h3>
+                                <p>Export summaries as PDF or share via link</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h2>🎯 How It Works</h2>
+                        <ol class="steps-list">
+                            <li>Upload your document (PDF or Image)</li>
+                            <li>Choose summary length (Short, Medium, or Long)</li>
+                            <li>Click "Generate Summary"</li>
+                            <li>Get instant summary with key points</li>
+                            <li>Translate, download, or share your summary</li>
+                        </ol>
+                    </div>
+
+                    <div class="about-section">
+                        <h2>💡 Use Cases</h2>
+                        <div class="use-cases">
+                            <div class="use-case">
+                                <h4>📚 Students</h4>
+                                <p>Quickly summarize research papers, textbooks, and study materials</p>
+                            </div>
+                            <div class="use-case">
+                                <h4>💼 Professionals</h4>
+                                <p>Extract key points from reports, contracts, and business documents</p>
+                            </div>
+                            <div class="use-case">
+                                <h4>🔬 Researchers</h4>
+                                <p>Review multiple papers efficiently and identify relevant information</p>
+                            </div>
+                            <div class="use-case">
+                                <h4>📰 Content Creators</h4>
+                                <p>Get quick insights from articles and create content summaries</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h2>🔒 Privacy & Security</h2>
+                        <p>We take your privacy seriously. All uploaded files are processed securely and automatically deleted after processing. We don't store your documents or summaries unless you explicitly choose to share them.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

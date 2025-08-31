@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "development"
+  ],
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not ios_saf <= 18.6",
+    "not safari <= 18.6",
+    "not and_ff <= 140",
+    "not firefox <= 141"
+  ],
+  "hints": {
+    "css-prefix-order": "off",
+    "axe/name-role-value": "off",
+    "axe/forms": [
+      "default",
+      {
+        "label": "off"
+      }
+    ]
+  }
+}

@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Snap - AI Powered Document Summaries</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Favicon set kiya -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📄</text></svg>">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <div class="logo-wrapper">
+                    <img class="logo-img" src="{{ url_for('static', filename='image24.jpeg') }}" alt="Info Snap Logo">
+                </div>
+                <span class="brand-text">Info Snap</span>
+            </a>
+            
+            <!-- Mobile ke liye toggle button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact"><i class="fas fa-envelope"></i> Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/developer"><i class="fas fa-code"></i> Developer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/blog"><i class="fas fa-blog"></i> Blog</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dark Mode Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <span id="themeIcon">🌙</span>
+    </button>
+
+    <!-- Main container with padding for fixed navbar -->
+    <div class="main-wrapper">
+        <div class="container">
+            <header>
+                <h1 class="main-title">
+                    <span class="title-icon">📑</span>
+                    <span class="title-text">Info Snap</span>
+                </h1>
+                <p class="subtitle">Upload your document and get an AI-powered summary instantly!</p>
+            </header>
+
+            <main>
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 10L12 5L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M12 5V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M5 15V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <h3>Drag & Drop your file here</h3>
+                        <p>or</p>
+                        <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                            Browse Files
+                        </button>
+                        <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.gif,.bmp" hidden>
+                        <p class="file-types">Supported: PDF, PNG, JPG, JPEG, GIF, BMP</p>
+                    </div>
+
+                    <!-- Summary Length Options -->
+                    <div class="options-section">
+                        <h3>Summary Length:</h3>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="length" value="short">
+                                <span class="radio-text">Short</span>
+                                <span class="radio-check"></span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="length" value="medium" checked>
+                                <span class="radio-text">Medium</span>
+                                <span class="radio-check"></span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="length" value="long">
+                                <span class="radio-text">Long</span>
+                                <span class="radio-check"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="generate-btn" id="generateBtn" disabled>
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text">Generate Summary</span>
+                    </button>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section" id="resultsSection" style="display: none;">
+                    <div class="summary-stats">
+                        <div class="stat">
+                            <span class="stat-label">Original Text</span>
+                            <span class="stat-value" id="originalWords">0 words</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Summary</span>
+                            <span class="stat-value" id="summaryWords">0 words</span>
+                        </div>
+                    </div>
+
+                    <!-- Summary Content -->
+                    <div class="summary-content">
+                        <h3>📝 Summary</h3>
+                        <p id="summaryText"></p>
+                    </div>
+
+                    <!-- Key Points -->
+                    <div class="key-points">
+                        <h3>🎯 Key Points</h3>
+                        <ul id="keyPointsList"></ul>
+                    </div>
+
+                    <!-- Translation Section -->
+                    <div class="translation-section">
+                        <h3>🌐 Translate Summary</h3>
+                        <div class="language-selector">
+                            <select id="languageSelect" class="language-dropdown">
+                                <option value="">Select Language</option>
+                                <option value="es">Spanish 🇪🇸</option>
+                                <option value="fr">French 🇫🇷</option>
+                                <option value="de">German 🇩🇪</option>
+                                <option value="it">Italian 🇮🇹</option>
+                                <option value="pt">Portuguese 🇵🇹</option>
+                                <option value="ru">Russian 🇷🇺</option>
+                                <option value="ja">Japanese 🇯🇵</option>
+                                <option value="ko">Korean 🇰🇷</option>
+                                <option value="zh-cn">Chinese (Simplified) 🇨🇳</option>
+                                <option value="ar">Arabic 🇸🇦</option>
+                                <option value="hi">Hindi 🇮🇳</option>
+                                <option value="tr">Turkish 🇹🇷</option>
+                                <option value="nl">Dutch 🇳🇱</option>
+                                <option value="sv">Swedish 🇸🇪</option>
+                                <option value="pl">Polish 🇵🇱</option>
+                            </select>
+                            <button class="translate-btn" id="translateBtn" onclick="translateSummary()">
+                                <span>🔄</span> Translate
+                            </button>
+                        </div>
+
+                        <div id="translatedResult" class="translated-content" style="display: none;">
+                            <h4>Translated Summary</h4>
+                            <p id="translatedText"></p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn download-btn" onclick="downloadPDF()">
+                            <span>📥</span> Download PDF                        </button>
+                            <button class="action-btn share-btn" onclick="shareSummary()">
+                                <span>🔗</span> Share Summary
+                            </button>
+                        </div>
+    
+                        <!-- Create New Summary Button -->
+                        <button class="new-summary-btn" onclick="resetApp()">
+                            <span>➕</span> Create New Summary
+                        </button>
+                    </div>
+    
+                    <!-- Loading State -->
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>✨ Processing your document...</p>
+                    </div>
+    
+                    <!-- Error Message -->
+                    <div class="error-message" id="errorMessage" style="display: none;">
+                        <p></p>
+                    </div>
+                </main>
+            </div>
+        </div>
+    
+        <!-- Share Modal -->
+        <div class="share-modal" id="shareModal">
+            <div class="modal-content">
+                <h3>🔗 Share Summary</h3>
+                <p>Copy this link to share your summary:</p>
+                <input type="text" class="share-input" id="shareLink" readonly>
+                <div class="modal-actions">
+                    <button class="action-btn copy-btn" onclick="copyShareLink()">
+                        <span>📋</span> Copy Link
+                    </button>
+                    <button class="action-btn close-btn" onclick="closeShareModal()">
+                        <span>✖️</span> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Share Overlay -->
+        <div class="share-overlay" id="shareOverlay" onclick="closeShareModal()"></div>
+    
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Apna JavaScript -->
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    </body>
+    
+    </html>
+                
