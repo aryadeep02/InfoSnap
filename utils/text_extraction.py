@@ -16,7 +16,6 @@ def extract_text_from_pdf(file_path):
                     text += f"\n--- Page {page_num} ---\n"
                     text += page_text
 
-        # If no text found, fallback: try OCR on images (scanned PDF)
         if not text.strip():
             try:
                 from pdf2image import convert_from_path
