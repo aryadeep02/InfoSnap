@@ -2,9 +2,20 @@ from transformers import pipeline
 import torch
 from deep_translator import GoogleTranslator
 
-# Initialize summarizer
-device = 0 if torch.cuda.is_available() else -1
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=device)
+# Global variable to hold summarizer pipeline (lazy init)
+_summarizer = None  
+
+def get_summarizer():
+    """Load summarizer pipeline only once (lazy loading)."""
+    global _summarizer
+    if _summarizer is None:
+        device = 0 if torch.cuda.is_available() else -1
+        # Load lightweight model if 512 MiB RAM, or keep bart-large-cnn if on bigger plan
+        model_name = "facebook/bart-large-cnn"
+        print(f"Loading summarizer model: {model_name} (device={device})")
+        _summarizer = pipeline("summarization", model=model_name, device=device)
+    return _summarizer
+
 
 def translate_text(text, target_language):
     """Translate text to target language"""
@@ -12,13 +23,13 @@ def translate_text(text, target_language):
         if target_language == 'en' or not target_language:
             return text
         
-        # Using deep-translator for more reliable translation
         translator = GoogleTranslator(source='auto', target=target_language)
         translation = translator.translate(text)
         return translation
     except Exception as e:
         print(f"Translation error: {e}")
         return text  # Return original if translation fails
+
 
 def generate_summary(text, length="medium"):
     """Generate summary with configurable length"""
@@ -29,15 +40,14 @@ def generate_summary(text, length="medium"):
         "medium": {"max_length": 150, "min_length": 60},
         "long": {"max_length": 250, "min_length": 100}
     }
-    
     config = length_config.get(length, length_config["medium"])
     
-    # Limit input text to model's max capacity
     max_input_length = 1024
     if len(text.split()) > max_input_length:
         text = ' '.join(text.split()[:max_input_length])
     
     try:
+        summarizer = get_summarizer()  # <-- Lazy load here
         summary = summarizer(
             text,
             max_length=config["max_length"],
@@ -55,6 +65,7 @@ def generate_summary(text, length="medium"):
             "success": False,
             "error": str(e)
         }
+
 
 def extract_key_points(summary):
     """Extract key points from summary"""
