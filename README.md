@@ -2,7 +2,7 @@
 
 A modern web application that uses artificial intelligence to automatically summarize documents and extract key information from PDFs and images.
 
-![AI Powered](https://img.shields.io/badge/AI-Powered-blue) ![Python](https://img.shields.io/badge/Python-3.8+-green) ![Flask](https://img.shields.io/badge/Flask-2.3.2-red) ![License](https://img.shields.io/badge/License-MIT-yellow)
+![AI Powered](https://img.shields.io/badge/AI-Powered-blue) ![Python](https://img.shields.io/badge/Python-3.8+-green) ![Flask](https://img.shields.io/badge/Flask-2.3.2-red) 
 
 ## 🌟 Overview
 
